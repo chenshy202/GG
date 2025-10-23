@@ -21,7 +21,8 @@ In this work, we leverage a statistically grounded method, one-hot graph encoder
     *   [yueliu1999/Awesome-Deep-Graph-Clustering](https://github.com/yueliu1999/Awesome-Deep-Graph-Clustering)
 
 *   **Presentations:**
-    * Contributed Talk: Slides from our accepted talk for the Joint Statistical Meetings (JSM) 2025. 
-    * Poster Presentation: Poster presented at the JHU Data Science and AI (DSAI) Poster Symposium 2025.
-    
-    ​	
+    * Contributed Talk: Slides from our accepted talk for the Joint Statistical Meetings (JSM), August 2025. 
+      * [➡️ View JSM Slides (PDF)](presentations/Slides.pdf)
+    * Poster Presentation: Poster presented at the JHU Data Science and AI (DSAI) Poster Symposium, April 2025.
+      * [➡️ View DSAI Poster (PDF)](presentations/Poster.pdf)
+
