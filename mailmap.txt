@@ -1,0 +1,2 @@
+Your Name <you@main.com> Other Name <other@email.com>
+Your Name <you@main.com> <other@email.com>
