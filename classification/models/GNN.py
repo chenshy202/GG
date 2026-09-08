@@ -21,35 +21,68 @@ import torch, numpy as np
 
 
 
+# class GCNEncoder(torch.nn.Module):
+#     """
+#     A two-layer Graph Convolutional Network (GCN) encoder.
+
+#     This architecture includes a residual connection that adds the input features (x)
+#     and the outputs of both GCN layers (z1, z2). 
+
+#     Input: Graph data (x, edge_index).
+#     Output: Node embeddings (Z).
+#     """
+#     def __init__(self, x, k):
+#         super(GCNEncoder, self).__init__()
+#         self.k = k
+#         self.x = nn.Parameter(x)
+        
+#         self.conv1 = GCNConv(k, k)
+#         self.conv2 = GCNConv(k, k)
+
+#     def forward(self, edge_index):
+#         z1 = self.conv1(self.x, edge_index)
+
+#         z2 = torch.relu(z1)            
+#         z2 = self.conv2(z2, edge_index)  
+
+#         z = self.x + z1 + z2
+#         z = F.normalize(z, p=2, dim=1)
+
+#         return z
+
 class GCNEncoder(torch.nn.Module):
     """
-    A two-layer Graph Convolutional Network (GCN) encoder.
-
-    This architecture includes a residual connection that adds the input features (x)
-    and the outputs of both GCN layers (z1, z2). 
-
-    Input: Graph data (x, edge_index).
-    Output: Node embeddings (Z).
+    A multi-layer Graph Convolutional Network (GCN) encoder.
     """
-    def __init__(self, x, k):
+    def __init__(self, x, k, num_layers=3): 
         super(GCNEncoder, self).__init__()
         self.k = k
         self.x = nn.Parameter(x)
-        
-        self.conv1 = GCNConv(k, k)
-        self.conv2 = GCNConv(k, k)
+        self.num_layers = num_layers 
+
+        self.convs = nn.ModuleList()
+        for _ in range(num_layers):
+            self.convs.append(GCNConv(k, k))
 
     def forward(self, edge_index):
-        z1 = self.conv1(self.x, edge_index)
+        layer_outputs = []
+        
+        current_z = self.x
+        
+        for i in range(self.num_layers):
+            current_z = self.convs[i](current_z, edge_index)
+            layer_outputs.append(current_z) 
 
-        z2 = torch.relu(z1)            
-        z2 = self.conv2(z2, edge_index)  
+            if i < self.num_layers - 1:
+                current_z = torch.relu(current_z)
 
-        z = self.x + z1 + z2
+        z = self.x
+        for out in layer_outputs:
+            z = z + out
+            
         z = F.normalize(z, p=2, dim=1)
 
         return z
-
 
 
 
@@ -88,7 +121,10 @@ def train(data, k=4, lr=0.01, num_epochs=10000, patience=50, concat = False, ret
             - Diagnostic information (loss, grad norms, val acc) if requested,
               otherwise None.
     """
-    model = GCNEncoder(data.x, k)
+    model = GCNEncoder(data.x, k, num_layers=3)
+
+    print(f"--- Initializing GCN model with {model.num_layers} layers ---")
+    # model = GCNEncoder(data.x, k)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr,
                                  weight_decay=5e-4)
